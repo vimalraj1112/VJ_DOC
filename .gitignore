@@ -1,0 +1,41 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# builds
+dist/
+build/
+.vite/
+
+# env
+.env
+.env.local
+.env.*.local
+!.env.example
+!.env.example.*
+
+# storage / temp processing files
+server/storage/
+server/tmp/
+server/uploads/
+*.log
+
+# editor / os
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# test / coverage
+coverage/
+.nyc_output/
+
+# misc
+*.tsbuildinfo
+.turbo/
+
+# local claude state
+/.claude/

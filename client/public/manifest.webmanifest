@@ -1,0 +1,34 @@
+{
+  "name": "VJ_DOC — All-in-one PDF tools",
+  "short_name": "VJ_DOC",
+  "description": "Forge every document into something better. Convert, merge, split, compress and protect PDFs — free, private, no sign-up.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FAFAFC",
+  "theme_color": "#FAFAFC",
+  "categories": ["productivity", "utilities", "business"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "PNG to PDF",
+      "short_name": "PNG→PDF",
+      "url": "/tools/png-to-pdf",
+      "description": "Convert PNG images into a professional PDF."
+    },
+    {
+      "name": "Merge PDF",
+      "short_name": "Merge",
+      "url": "/tools/merge-pdf",
+      "description": "Combine multiple PDFs into one."
+    }
+  ]
+}
