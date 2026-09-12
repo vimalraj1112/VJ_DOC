@@ -5,6 +5,7 @@ import { PdfToImageWorkflow } from './pdfToImage/PdfToImageWorkflow';
 import { MergeWorkflow } from './merge/MergeWorkflow';
 import { PageOpWorkflow } from './pageOps/PageOpWorkflow';
 import { PdfOpWorkflow } from './pdfOp/PdfOpWorkflow';
+import { ImageOpWorkflow } from './imageOp/ImageOpWorkflow';
 
 export interface WorkflowMap {
   imageToPdf: ComponentType<{ tool: ToolDef }>;
@@ -12,6 +13,7 @@ export interface WorkflowMap {
   merge: ComponentType<{ tool: ToolDef }>;
   pageOp: ComponentType<{ tool: ToolDef }>;
   pdfOp: ComponentType<{ tool: ToolDef }>;
+  imageOp: ComponentType<{ tool: ToolDef }>;
 }
 
 export const WORKFLOWS: WorkflowMap = {
@@ -20,6 +22,7 @@ export const WORKFLOWS: WorkflowMap = {
   merge: MergeWorkflow,
   pageOp: PageOpWorkflow,
   pdfOp: PdfOpWorkflow,
+  imageOp: ImageOpWorkflow,
 };
 
 /** Resolve the workflow component for a tool's hyphenated `kind`, or null if none. */
@@ -35,6 +38,8 @@ export function workflowFor(kind: ToolDef['kind']): ComponentType<{ tool: ToolDe
       return WORKFLOWS.pageOp;
     case 'pdfOp':
       return WORKFLOWS.pdfOp;
+    case 'image-op':
+      return WORKFLOWS.imageOp;
     default:
       return null;
   }

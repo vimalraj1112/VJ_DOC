@@ -13,7 +13,8 @@ export type ProcessorKind =
   | 'pageOps'
   | 'rotate'
   | 'overlay'
-  | 'compress';
+  | 'compress'
+  | 'imageOp';
 export type AcceptedKind = 'pdf' | 'png' | 'jpeg' | 'webp';
 
 export interface ToolConfig {
@@ -82,6 +83,17 @@ export const toolRegistry: Registry = {
   'add-page-numbers': pdfOpTool('add-page-numbers', 'Add Page Numbers', 'overlay', { op: 'pageNumber', start: 1, position: 'bottom-right' }),
   'sign-pdf': pdfOpTool('sign-pdf', 'Sign PDF', 'overlay', { op: 'signature', text: '' }),
   'compress-pdf': pdfOpTool('compress-pdf', 'Compress PDF', 'compress', { quality: 60 }),
+
+  // Image op tools: format transcodes are single-input-kind; resize/crop accept
+  // any image kind. Each returns one output per input.
+  'webp-to-png': imageOpTool('webp-to-png', 'WEBP to PNG', ['webp'], { op: 'format', format: 'png', quality: 100 }),
+  'webp-to-jpg': imageOpTool('webp-to-jpg', 'WEBP to JPG', ['webp'], { op: 'format', format: 'jpg', quality: 82 }),
+  'png-to-webp': imageOpTool('png-to-webp', 'PNG to WEBP', ['png'], { op: 'format', format: 'webp', quality: 82 }),
+  'png-to-jpg': imageOpTool('png-to-jpg', 'PNG to JPG', ['png'], { op: 'format', format: 'jpg', quality: 82 }),
+  'jpg-to-webp': imageOpTool('jpg-to-webp', 'JPG to WEBP', ['jpeg'], { op: 'format', format: 'webp', quality: 82 }),
+  'jpg-to-png': imageOpTool('jpg-to-png', 'JPG to PNG', ['jpeg'], { op: 'format', format: 'png', quality: 100 }),
+  'image-resize': imageOpTool('image-resize', 'Resize Image', ['png', 'jpeg', 'webp'], { op: 'resize', scale: 75 }),
+  'image-crop': imageOpTool('image-crop', 'Crop Image', ['png', 'jpeg', 'webp'], { op: 'crop', left: 0, top: 0, width: 100, height: 100 }),
 };
 
 function pageOpsTool(id: string, label: string, defaults: Record<string, unknown>): ToolConfig {
@@ -111,6 +123,19 @@ function pdfOpTool(
     minFiles: 1,
     maxFiles: 1,
     singleOutput: true,
+    defaultOptions: defaults,
+  };
+}
+
+function imageOpTool(id: string, label: string, accepts: AcceptedKind[], defaults: Record<string, unknown>): ToolConfig {
+  return {
+    id,
+    processor: 'imageOp',
+    label,
+    accepts,
+    minFiles: 1,
+    maxFiles: 10,
+    singleOutput: false,
     defaultOptions: defaults,
   };
 }

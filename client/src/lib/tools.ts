@@ -3,6 +3,7 @@ import {
   FileImage,
   FileOutput,
   FileType2,
+  Maximize2,
   FileSpreadsheet,
   Presentation,
   FileJson,
@@ -38,7 +39,7 @@ import {
 
 export type CategoryKey = 'convert' | 'organize' | 'optimize' | 'edit' | 'security' | 'sign' | 'ai';
 
-export type ToolKind = 'image-to-pdf' | 'pdf-to-image' | 'merge' | 'page-op' | 'pdfOp' | 'soon';
+export type ToolKind = 'image-to-pdf' | 'pdf-to-image' | 'merge' | 'page-op' | 'pdfOp' | 'image-op' | 'soon';
 
 export interface SettingField {
   key: string;
@@ -214,11 +215,64 @@ function imageToPdf(id: string, name: string, accept: string, acceptHint: string
   };
 }
 
+/** Builder for the image-op tools (format transcode / resize / crop). */
+function imageOp(
+  id: string,
+  name: string,
+  tagline: string,
+  description: string,
+  accept: string,
+  acceptHint: string,
+  category: CategoryKey,
+  icon: LucideIcon,
+  settings: SettingField[] | undefined,
+  related: string[],
+  accent: readonly [string, string],
+): ToolBuilder {
+  return {
+    id,
+    category,
+    name,
+    tagline,
+    description,
+    icon,
+    kind: 'image-op',
+    accept,
+    acceptHint,
+    minFiles: 1,
+    maxFiles: 10,
+    settings,
+    related,
+    accent,
+  };
+}
+
+const RESIZE_SETTINGS: SettingField[] = [
+  { key: 'scale', label: 'Scale', type: 'slider', default: 75, min: 5, max: 200, step: 5, suffix: '%', help: 'Percent of the original size. Values over 100% upscale.' },
+];
+const CROP_SETTINGS: SettingField[] = [
+  { key: 'width', label: 'Width', type: 'slider', default: 100, min: 10, max: 100, step: 5, suffix: '%', help: 'How much of the image width to keep.' },
+  { key: 'left', label: 'Left edge', type: 'slider', default: 0, min: 0, max: 90, step: 5, suffix: '%' },
+  { key: 'height', label: 'Height', type: 'slider', default: 100, min: 10, max: 100, step: 5, suffix: '%' },
+  { key: 'top', label: 'Top edge', type: 'slider', default: 0, min: 0, max: 90, step: 5, suffix: '%' },
+];
+
 export const TOOLS: ToolDef[] = [
   // ── Convert ─────────────────────────────────────────────
   imageToPdf('png-to-pdf', 'PNG to PDF', 'image/png', 'PNG', 'Convert PNG images into sharp, professional PDF documents.', ['#22d3ee', '#0e7490']),
   imageToPdf('jpg-to-pdf', 'JPG to PDF', 'image/jpeg', 'JPG, JPEG', 'Turn JPG photographs into polished PDF files in one click.', ['#f59e0b', '#b45309']),
   imageToPdf('webp-to-pdf', 'WEBP to PDF', 'image/webp', 'WEBP', 'Convert high-efficiency WEBP images into clean PDF pages.', ['#a78bfa', '#6d28d9']),
+
+  imageOp('webp-to-png', 'WEBP to PNG', 'Convert WEBP images to crisp, lossless PNG.', 'Transcode high-efficiency WEBP images into PNG with perfect quality — ideal for editing or screenshots that need a transparent, lossless format.', 'image/webp', 'WEBP', 'convert', FileImage, undefined, ['png-to-webp', 'webp-to-jpg'], ['#a78bfa', '#6d28d9']),
+  imageOp('webp-to-jpg', 'WEBP to JPG', 'Turn WEBP images into widely-supported JPG photos.', 'Convert WEBP to JPG for maximum compatibility with apps, email and social platforms that still prefer classic JPG files.', 'image/webp', 'WEBP', 'convert', FileImage, undefined, ['jpg-to-webp', 'webp-to-png'], ['#fbbf24', '#b45309']),
+  imageOp('png-to-webp', 'PNG to WEBP', 'Shrink PNG files into efficient WEBP images.', 'Compress PNG to WEBP for dramatically smaller files with negligible quality loss — perfect for the web.', 'image/png', 'PNG', 'convert', FileImage, undefined, ['webp-to-png', 'png-to-jpg'], ['#22d3ee', '#0369a1']),
+  imageOp('png-to-jpg', 'PNG to JPG', 'Convert PNG images into compact JPG photos.', 'Turn PNG into JPG for smaller files and universal compatibility. Great for photos where transparency is not required.', 'image/png', 'PNG', 'convert', FileImage, undefined, ['jpg-to-png', 'png-to-webp'], ['#f59e0b', '#b45309']),
+  imageOp('jpg-to-webp', 'JPG to WEBP', 'Convert JPG photos into lightweight WEBP.', 'Re-encode JPG to WEBP for up to 60% smaller files that load faster without noticeably losing quality.', 'image/jpeg', 'JPG, JPEG', 'convert', FileImage, undefined, ['webp-to-jpg', 'auto-pdf-from-images'], ['#38bdf8', '#0369a1']),
+  imageOp('jpg-to-png', 'JPG to PNG', 'Convert JPG to lossless, transparent PNG.', 'Upgrade JPG photos to PNG for lossless quality and transparent backgrounds.', 'image/jpeg', 'JPG, JPEG', 'convert', FileImage, undefined, ['png-to-jpg', 'jpg-to-webp'], ['#34d399', '#047857']),
+
+  imageOp('image-resize', 'Resize Image', 'Scale images down or up as a percentage.', 'Resize one or many images by a percentage of their original size — shrink large photos for the web or upscale small ones.', 'image/*', 'JPG, PNG, WEBP', 'optimize', Maximize2, RESIZE_SETTINGS, ['image-crop', 'compress-pdf'], ['#2dd4bf', '#0f766e']),
+  imageOp('image-crop', 'Crop Image', 'Trim images to focus on what matters.', 'Crop one or many images by setting the visible area as percentages — cut away edges to keep only the part you need.', 'image/*', 'JPG, PNG, WEBP', 'edit', Crop, CROP_SETTINGS, ['image-resize', 'edit-pdf'], ['#f87171', '#b91c1c']),
+
   {
     id: 'pdf-to-jpg',
     category: 'convert',

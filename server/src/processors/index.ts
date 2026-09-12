@@ -5,6 +5,7 @@ import { mergePdfProcessor, pageOpsProcessor } from './pdfLibProcessors.js';
 import { rotatePdfProcessor } from './rotatePdfProcessor.js';
 import { overlayPdfProcessor } from './overlayPdfProcessor.js';
 import { compressPdfProcessor } from './compressPdfProcessor.js';
+import { imageOpProcessor } from './imageOpProcessor.js';
 import type { Processor } from './types.js';
 
 /**
@@ -19,6 +20,7 @@ const processByKind: Record<ProcessorKind, Processor> = {
   rotate: rotatePdfProcessor,
   overlay: overlayPdfProcessor,
   compress: compressPdfProcessor,
+  imageOp: imageOpProcessor,
 };
 
 export function resolveProcessor(kind: ProcessorKind): Processor {
