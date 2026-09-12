@@ -14,7 +14,8 @@ export type ProcessorKind =
   | 'rotate'
   | 'overlay'
   | 'compress'
-  | 'imageOp';
+  | 'imageOp'
+  | 'documentOp';
 export type AcceptedKind = 'pdf' | 'png' | 'jpeg' | 'webp';
 
 export interface ToolConfig {
@@ -94,6 +95,9 @@ export const toolRegistry: Registry = {
   'jpg-to-png': imageOpTool('jpg-to-png', 'JPG to PNG', ['jpeg'], { op: 'format', format: 'png', quality: 100 }),
   'image-resize': imageOpTool('image-resize', 'Resize Image', ['png', 'jpeg', 'webp'], { op: 'resize', scale: 75 }),
   'image-crop': imageOpTool('image-crop', 'Crop Image', ['png', 'jpeg', 'webp'], { op: 'crop', left: 0, top: 0, width: 100, height: 100 }),
+
+  'extract-text': documentOpTool('extract-text', 'Extract Text', { op: 'extract-text' }),
+  'remove-metadata': documentOpTool('remove-metadata', 'Remove Metadata', { op: 'remove-metadata' }),
 };
 
 function pageOpsTool(id: string, label: string, defaults: Record<string, unknown>): ToolConfig {
@@ -136,6 +140,19 @@ function imageOpTool(id: string, label: string, accepts: AcceptedKind[], default
     minFiles: 1,
     maxFiles: 10,
     singleOutput: false,
+    defaultOptions: defaults,
+  };
+}
+
+function documentOpTool(id: string, label: string, defaults: Record<string, unknown>): ToolConfig {
+  return {
+    id,
+    processor: 'documentOp',
+    label,
+    accepts: ['pdf'],
+    minFiles: 1,
+    maxFiles: 1,
+    singleOutput: true,
     defaultOptions: defaults,
   };
 }

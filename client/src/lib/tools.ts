@@ -35,11 +35,12 @@ import {
   Languages,
   FileDown,
   Wand2,
+  ShieldCheck,
 } from 'lucide-react';
 
 export type CategoryKey = 'convert' | 'organize' | 'optimize' | 'edit' | 'security' | 'sign' | 'ai';
 
-export type ToolKind = 'image-to-pdf' | 'pdf-to-image' | 'merge' | 'page-op' | 'pdfOp' | 'image-op' | 'soon';
+export type ToolKind = 'image-to-pdf' | 'pdf-to-image' | 'merge' | 'page-op' | 'pdfOp' | 'image-op' | 'docOp' | 'soon';
 
 export interface SettingField {
   key: string;
@@ -272,6 +273,37 @@ export const TOOLS: ToolDef[] = [
 
   imageOp('image-resize', 'Resize Image', 'Scale images down or up as a percentage.', 'Resize one or many images by a percentage of their original size — shrink large photos for the web or upscale small ones.', 'image/*', 'JPG, PNG, WEBP', 'optimize', Maximize2, RESIZE_SETTINGS, ['image-crop', 'compress-pdf'], ['#2dd4bf', '#0f766e']),
   imageOp('image-crop', 'Crop Image', 'Trim images to focus on what matters.', 'Crop one or many images by setting the visible area as percentages — cut away edges to keep only the part you need.', 'image/*', 'JPG, PNG, WEBP', 'edit', Crop, CROP_SETTINGS, ['image-resize', 'edit-pdf'], ['#f87171', '#b91c1c']),
+
+  {
+    id: 'extract-text',
+    category: 'convert',
+    name: 'Extract Text',
+    tagline: 'Pull every word out of a PDF into a clean text file.',
+    description: 'Extract the text from any text-based PDF and get it back as a plain .txt file — perfect for quoting, editing or repurposing content. (Text amount varies by how the PDF encodes its content.)',
+    icon: Type,
+    kind: 'docOp',
+    accept: 'application/pdf',
+    acceptHint: 'PDF',
+    minFiles: 1,
+    maxFiles: 1,
+    related: ['remove-metadata', 'compress-pdf'],
+    accent: ['#38bdf8', '#0369a1'],
+  },
+  {
+    id: 'remove-metadata',
+    category: 'optimize',
+    name: 'Remove Metadata',
+    tagline: 'Wipe hidden info like author, title and producer from a PDF.',
+    description: 'Rebuild your PDF without its hidden metadata (author, title, creator, producer, dates) so you can share it without leaking who made it or when.',
+    icon: ShieldCheck,
+    kind: 'docOp',
+    accept: 'application/pdf',
+    acceptHint: 'PDF',
+    minFiles: 1,
+    maxFiles: 1,
+    related: ['extract-text', 'compress-pdf'],
+    accent: ['#34d399', '#047857'],
+  },
 
   {
     id: 'pdf-to-jpg',

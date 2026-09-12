@@ -6,6 +6,7 @@ import { rotatePdfProcessor } from './rotatePdfProcessor.js';
 import { overlayPdfProcessor } from './overlayPdfProcessor.js';
 import { compressPdfProcessor } from './compressPdfProcessor.js';
 import { imageOpProcessor } from './imageOpProcessor.js';
+import { documentOpProcessor } from './documentOpProcessor.js';
 import type { Processor } from './types.js';
 
 /**
@@ -21,6 +22,7 @@ const processByKind: Record<ProcessorKind, Processor> = {
   overlay: overlayPdfProcessor,
   compress: compressPdfProcessor,
   imageOp: imageOpProcessor,
+  documentOp: documentOpProcessor,
 };
 
 export function resolveProcessor(kind: ProcessorKind): Processor {
