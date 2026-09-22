@@ -1,5 +1,5 @@
 import fs from 'node:fs/promises';
-import { sniffBuffer, type SniffedKind } from '../utils/fileSignature.js';
+import { sniffBuffer, classifyOffice, type SniffedKind } from '../utils/fileSignature.js';
 
 export interface SniffOutcome {
   kind: SniffedKind;
@@ -15,6 +15,9 @@ const KIND_LABELS: Record<SniffedKind, string> = {
   webp: 'a WEBP image',
   gif: 'a GIF image',
   zip: 'a ZIP archive',
+  docx: 'a Word document',
+  xlsx: 'an Excel workbook',
+  pptx: 'a PowerPoint presentation',
   unknown: 'an unreadable file',
 };
 
@@ -34,3 +37,5 @@ export async function sniffer(file: { diskPath: string }): Promise<SniffOutcome>
     await handle?.close().catch(() => undefined);
   }
 }
+
+export { classifyOffice, OFFICE_MIME_TYPES } from '../utils/fileSignature.js';

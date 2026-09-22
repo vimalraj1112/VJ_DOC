@@ -7,11 +7,14 @@ import { overlayPdfProcessor } from './overlayPdfProcessor.js';
 import { compressPdfProcessor } from './compressPdfProcessor.js';
 import { imageOpProcessor } from './imageOpProcessor.js';
 import { documentOpProcessor } from './documentOpProcessor.js';
+import { securityPdfProcessor } from './securityPdfProcessor.js';
+import { officeProcessor } from './officeProcessor.js';
+import { aiDocumentProcessor } from './aiDocumentProcessor.js';
 import type { Processor } from './types.js';
 
 /**
  * Maps a tool's `processor` kind to its implementation.
- * ExtENDING here (and in toolRegistry) is all that is needed to add a tool.
+ * EXTENDING here (and in toolRegistry) is all that is needed to add a tool.
  */
 const processByKind: Record<ProcessorKind, Processor> = {
   imageToPdf: imageToPdfProcessor,
@@ -23,6 +26,9 @@ const processByKind: Record<ProcessorKind, Processor> = {
   compress: compressPdfProcessor,
   imageOp: imageOpProcessor,
   documentOp: documentOpProcessor,
+  securityPdf: securityPdfProcessor,
+  office: officeProcessor,
+  aiDoc: aiDocumentProcessor,
 };
 
 export function resolveProcessor(kind: ProcessorKind): Processor {

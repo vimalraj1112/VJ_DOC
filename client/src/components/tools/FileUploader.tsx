@@ -20,6 +20,9 @@ const ACCEPT_LABEL: Record<string, string> = {
   'image/jpeg': 'JPG',
   'image/webp': 'WEBP',
   'application/pdf': 'PDF',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'DOCX',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'XLSX',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'PPTX',
 };
 
 export function FileUploader({

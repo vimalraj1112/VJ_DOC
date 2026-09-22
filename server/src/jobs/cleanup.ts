@@ -1,5 +1,7 @@
 import { FileModel } from '../models/File.js';
 import { ProcessingJobModel } from '../models/ProcessingJob.js';
+import { SignatureRequestModel } from '../models/SignatureRequest.js';
+import { expireRequest } from '../services/signatureService.js';
 import { getStorage } from '../storage/index.js';
 import { logger } from '../utils/logger.js';
 import { env } from '../config/env.js';
@@ -40,6 +42,16 @@ export async function runCleanup(): Promise<void> {
     { $set: { status: 'FAILED', stage: 'Timed out', error: 'Processing exceeded its time limit.' } },
   );
   if (expiredJobs.modifiedCount) logger.job(`Cleanup: timed out ${expiredJobs.modifiedCount} stale jobs`);
+
+  // 3. Expired signature requests: free the stored PDF, flip status to EXPIRED.
+  const expiredSignatures = await SignatureRequestModel.find({
+    expiresAt: { $lte: now },
+    status: { $in: ['PENDING', 'SIGNED'] },
+  });
+  for (const request of expiredSignatures) await expireRequest(request).catch(() => undefined);
+  if (expiredSignatures.length) {
+    logger.job(`Cleanup: expired ${expiredSignatures.length} signature requests`);
+  }
 }
 
 let timer: NodeJS.Timeout | null = null;

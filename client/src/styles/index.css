@@ -141,6 +141,19 @@
     background-clip: text;
     color: transparent;
   }
+  .text-gradient-animated {
+    background: linear-gradient(110deg, var(--primary) 10%, #22d3ee 40%, var(--secondary) 70%, var(--primary) 100%);
+    background-size: 240% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: gradient-shift 7s linear infinite;
+  }
+  @keyframes gradient-shift {
+    to {
+      background-position: -240% center;
+    }
+  }
   .bg-glow {
     background: radial-gradient(ellipse at top, var(--primary-soft), transparent 60%);
   }

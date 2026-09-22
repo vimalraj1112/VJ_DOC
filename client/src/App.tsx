@@ -10,6 +10,7 @@ import { Home } from '@/pages/Home';
 import { Tools } from '@/pages/Tools';
 import { ToolPage } from '@/pages/ToolPage';
 import { Pricing } from '@/pages/Pricing';
+import { SignPage } from '@/pages/SignPage';
 import { NotFound } from '@/pages/NotFound';
 
 function ScrollToTop() {
@@ -35,6 +36,7 @@ export default function App() {
             <Route path="/tools" element={<Tools />} />
             <Route path="/tools/:toolId" element={<ToolPage />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/s/:token" element={<SignPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

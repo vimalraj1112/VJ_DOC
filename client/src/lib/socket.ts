@@ -26,6 +26,7 @@ export function subscribeToJob(
     onProgress?: (progress: number, stage: string) => void;
     onCompleted?: (payload: JobProgressPayload) => void;
     onFailed?: (error?: string) => void;
+    onCancelled?: (payload: JobProgressPayload) => void;
   },
 ): () => void {
   const s = getSocket();
@@ -34,10 +35,12 @@ export function subscribeToJob(
   const onProgress = (payload: JobProgressPayload) => handlers.onProgress?.(payload.progress, payload.stage);
   const onCompleted = (payload: JobProgressPayload) => handlers.onCompleted?.(payload);
   const onFailed = (payload: JobProgressPayload) => handlers.onFailed?.(payload.error);
+  const onCancelled = (payload: JobProgressPayload) => handlers.onCancelled?.(payload);
 
   s.on('job:progress', onProgress);
   s.on('job:completed', onCompleted);
   s.on('job:failed', onFailed);
+  s.on('job:cancelled', onCancelled);
 
   s.emit('job:join', jobId);
 
@@ -45,6 +48,7 @@ export function subscribeToJob(
     s.off('job:progress', onProgress);
     s.off('job:completed', onCompleted);
     s.off('job:failed', onFailed);
+    s.off('job:cancelled', onCancelled);
     s.emit('job:leave', jobId);
   };
 }

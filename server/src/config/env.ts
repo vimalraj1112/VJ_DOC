@@ -46,13 +46,27 @@ export const env = {
     '../../',
     str('STORAGE_LOCAL_DIR', 'storage'),
   ),
+  s3: {
+    endpoint: process.env.S3_ENDPOINT ?? '',
+    bucket: process.env.S3_BUCKET ?? '',
+    region: process.env.S3_REGION ?? 'us-east-1',
+    accessKey: process.env.S3_ACCESS_KEY ?? '',
+    secretKey: process.env.S3_SECRET_KEY ?? '',
+    forcePathStyle: str('S3_FORCE_PATH_STYLE', 'true') === 'true',
+    publicBaseUrl: process.env.S3_PUBLIC_BASE_URL ?? '',
+  },
   maxFileSizeMb: num('MAX_FILE_SIZE_MB', 100),
   maxFilesPerRequest: num('MAX_FILES_PER_REQUEST', 30),
   fileTtlHours: num('FILE_TTL_HOURS', 24),
+  /** How many jobs may run at once in the in-process queue. */
+  queueConcurrency: num('QUEUE_CONCURRENCY', 2),
+  /** Absolute path to `soffice`; auto-detected when empty. */
+  libreofficePath: process.env.LIBREOFFICE_PATH ?? '',
   ai: {
     provider: process.env.AI_PROVIDER ?? '',
     apiKey: process.env.AI_API_KEY ?? '',
     model: process.env.AI_MODEL ?? '',
+    baseUrl: process.env.AI_BASE_URL ?? '',
   },
 } as const;
 

@@ -14,7 +14,7 @@ export function InstallBanner() {
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
-          className="mx-auto w-full max-w-5xl px-4"
+          className="mx-auto w-full max-w-5xl px-4 pt-14 sm:pt-16"
         >
           <div className="mt-3 flex items-center gap-3 rounded-xl border border-line bg-surface/95 px-4 py-3 shadow-pop backdrop-blur-xl">
             <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">

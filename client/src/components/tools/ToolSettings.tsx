@@ -55,11 +55,12 @@ function Field({ field, value, onChange }: { field: SettingField; value: string 
     );
   }
 
-  if (field.type === 'text') {
+  if (field.type === 'text' || field.type === 'password') {
     return (
       <input
-        type="text"
+        type={field.type}
         value={String(value)}
+        autoComplete={field.type === 'password' ? 'new-password' : undefined}
         onChange={(e) => onChange(e.target.value)}
         className="w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm outline-none transition-colors placeholder:text-faint focus:border-primary"
         aria-label={field.label}

@@ -21,6 +21,12 @@ export interface JobResult {
   outputFiles: string[];
 }
 
+/** GET /jobs/:jobId — adds the deserialized output files for downloads. */
+export interface JobDetail extends JobResult {
+  files: FileResult[];
+  error?: string | null;
+}
+
 export interface ProcessResponse {
   job: JobResult;
   outputFiles: FileResult[];
@@ -38,4 +44,22 @@ export function fileViewUrl(file: FileResult): string {
 
 export function fileDownloadName(file: FileResult): string {
   return file.name;
+}
+
+/** Public data for a signature request (shown on the signer's page). */
+export interface SignatureRequestView {
+  id: string;
+  documentTitle: string;
+  signerName: string | null;
+  signerEmail: string | null;
+  status: 'PENDING' | 'SIGNED' | 'CANCELLED' | 'EXPIRED';
+  signedAt: string | null;
+  requestedAt: string;
+  expiresAt: string;
+}
+
+/** What the requester receives after creating a signature request. */
+export interface SignatureRequestCreated extends SignatureRequestView {
+  token: string;
+  signingUrl: string;
 }

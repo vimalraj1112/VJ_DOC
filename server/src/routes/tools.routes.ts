@@ -98,13 +98,15 @@ router.post(
         clientFingerprint: fingerprint,
       });
 
+      // 202 Accepted: the job is queued and runs off the HTTP request. The
+      // client tracks progress/completion via Socket.IO or a GET /jobs/:id poll.
       ok(
         res,
         {
           job: mapJob(result.job),
           outputFiles: result.outputFiles.map(mapFile),
         },
-        200,
+        202,
       );
     } finally {
       if (inputFiles) await clearUploadedFiles(inputFiles);

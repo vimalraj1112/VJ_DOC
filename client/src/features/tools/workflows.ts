@@ -7,6 +7,7 @@ import { PageOpWorkflow } from './pageOps/PageOpWorkflow';
 import { PdfOpWorkflow } from './pdfOp/PdfOpWorkflow';
 import { ImageOpWorkflow } from './imageOp/ImageOpWorkflow';
 import { DocumentWorkflow } from './documentOp/DocumentWorkflow';
+import { RequestSignatureWorkflow } from './requestSignature/RequestSignatureWorkflow';
 
 export interface WorkflowMap {
   imageToPdf: ComponentType<{ tool: ToolDef }>;
@@ -16,6 +17,10 @@ export interface WorkflowMap {
   pdfOp: ComponentType<{ tool: ToolDef }>;
   imageOp: ComponentType<{ tool: ToolDef }>;
   docOp: ComponentType<{ tool: ToolDef }>;
+  office: ComponentType<{ tool: ToolDef }>;
+  securityPdf: ComponentType<{ tool: ToolDef }>;
+  aiDoc: ComponentType<{ tool: ToolDef }>;
+  signatureRequest: ComponentType<{ tool: ToolDef }>;
 }
 
 export const WORKFLOWS: WorkflowMap = {
@@ -26,6 +31,10 @@ export const WORKFLOWS: WorkflowMap = {
   pdfOp: PdfOpWorkflow,
   imageOp: ImageOpWorkflow,
   docOp: DocumentWorkflow,
+  office: DocumentWorkflow,
+  securityPdf: DocumentWorkflow,
+  aiDoc: DocumentWorkflow,
+  signatureRequest: RequestSignatureWorkflow,
 };
 
 /** Resolve the workflow component for a tool's hyphenated `kind`, or null if none. */
@@ -44,7 +53,12 @@ export function workflowFor(kind: ToolDef['kind']): ComponentType<{ tool: ToolDe
     case 'image-op':
       return WORKFLOWS.imageOp;
     case 'docOp':
+    case 'office':
+    case 'securityPdf':
+    case 'aiDoc':
       return WORKFLOWS.docOp;
+    case 'signatureRequest':
+      return WORKFLOWS.signatureRequest;
     default:
       return null;
   }

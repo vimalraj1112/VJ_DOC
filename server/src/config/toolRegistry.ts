@@ -15,8 +15,11 @@ export type ProcessorKind =
   | 'overlay'
   | 'compress'
   | 'imageOp'
-  | 'documentOp';
-export type AcceptedKind = 'pdf' | 'png' | 'jpeg' | 'webp';
+  | 'documentOp'
+  | 'securityPdf'
+  | 'office'
+  | 'aiDoc';
+export type AcceptedKind = 'pdf' | 'png' | 'jpeg' | 'webp' | 'docx' | 'xlsx' | 'pptx';
 
 export interface ToolConfig {
   id: string;
@@ -98,6 +101,24 @@ export const toolRegistry: Registry = {
 
   'extract-text': documentOpTool('extract-text', 'Extract Text', { op: 'extract-text' }),
   'remove-metadata': documentOpTool('remove-metadata', 'Remove Metadata', { op: 'remove-metadata' }),
+
+  // ── Security ───────────────────────────────────────────
+  'protect-pdf': securityTool('protect-pdf', 'Protect PDF', { op: 'protect' }),
+  'unlock-pdf': securityTool('unlock-pdf', 'Unlock PDF', { op: 'unlock' }),
+  'redact-pdf': securityTool('redact-pdf', 'Redact PDF', { op: 'redact' }),
+
+  // ── Office conversions ─────────────────────────────────
+  'word-to-pdf': officeTool('word-to-pdf', 'Word to PDF', ['docx'], { op: 'docx-to-pdf' }),
+  'excel-to-pdf': officeTool('excel-to-pdf', 'Excel to PDF', ['xlsx'], { op: 'xlsx-to-pdf' }),
+  'ppt-to-pdf': officeTool('ppt-to-pdf', 'PowerPoint to PDF', ['pptx'], { op: 'pptx-to-pdf' }),
+  'pdf-to-word': officeTool('pdf-to-word', 'PDF to Word', ['pdf'], { op: 'pdf-to-docx' }),
+  'pdf-to-excel': officeTool('pdf-to-excel', 'PDF to Excel', ['pdf'], { op: 'pdf-to-xlsx' }),
+  'pdf-to-ppt': officeTool('pdf-to-ppt', 'PDF to PowerPoint', ['pdf'], { op: 'pdf-to-pptx' }),
+
+  // ── AI documents ───────────────────────────────────────
+  'pdf-to-markdown': aiTool('pdf-to-markdown', 'PDF to Markdown', { op: 'markdown' }),
+  'ai-summary': aiTool('ai-summary', 'AI PDF Summary', { op: 'summary' }),
+  'ask-pdf': aiTool('ask-pdf', 'Ask PDF', { op: 'ask' }),
 };
 
 function pageOpsTool(id: string, label: string, defaults: Record<string, unknown>): ToolConfig {
@@ -148,6 +169,48 @@ function documentOpTool(id: string, label: string, defaults: Record<string, unkn
   return {
     id,
     processor: 'documentOp',
+    label,
+    accepts: ['pdf'],
+    minFiles: 1,
+    maxFiles: 1,
+    singleOutput: true,
+    defaultOptions: defaults,
+  };
+}
+
+/** Security tools (protect / unlock / redact) take one PDF + a secret option. */
+function securityTool(id: string, label: string, defaults: Record<string, unknown>): ToolConfig {
+  return {
+    id,
+    processor: 'securityPdf',
+    label,
+    accepts: ['pdf'],
+    minFiles: 1,
+    maxFiles: 1,
+    singleOutput: true,
+    defaultOptions: defaults,
+  };
+}
+
+/** Office conversions accept one input of one specific content type. */
+function officeTool(id: string, label: string, accepts: AcceptedKind[], defaults: Record<string, unknown>): ToolConfig {
+  return {
+    id,
+    processor: 'office',
+    label,
+    accepts,
+    minFiles: 1,
+    maxFiles: 1,
+    singleOutput: true,
+    defaultOptions: defaults,
+  };
+}
+
+/** AI tools operate on one PDF and produce a text/markdown result. */
+function aiTool(id: string, label: string, defaults: Record<string, unknown>): ToolConfig {
+  return {
+    id,
+    processor: 'aiDoc',
     label,
     accepts: ['pdf'],
     minFiles: 1,

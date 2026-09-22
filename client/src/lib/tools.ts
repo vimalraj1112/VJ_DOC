@@ -40,12 +40,12 @@ import {
 
 export type CategoryKey = 'convert' | 'organize' | 'optimize' | 'edit' | 'security' | 'sign' | 'ai';
 
-export type ToolKind = 'image-to-pdf' | 'pdf-to-image' | 'merge' | 'page-op' | 'pdfOp' | 'image-op' | 'docOp' | 'soon';
+export type ToolKind = 'image-to-pdf' | 'pdf-to-image' | 'merge' | 'page-op' | 'pdfOp' | 'image-op' | 'docOp' | 'office' | 'securityPdf' | 'aiDoc' | 'signatureRequest' | 'soon';
 
 export interface SettingField {
   key: string;
   label: string;
-  type: 'select' | 'segmented' | 'slider' | 'text';
+  type: 'select' | 'segmented' | 'slider' | 'text' | 'password';
   options?: { value: string | number; label: string }[];
   default: string | number;
   min?: number;
@@ -87,6 +87,25 @@ export const CATEGORY_META: Record<CategoryKey, { label: string; blurb: string }
 };
 
 export const CATEGORY_ORDER: CategoryKey[] = ['convert', 'organize', 'optimize', 'edit', 'security', 'sign', 'ai'];
+
+/** Office Open XML MIME types used by the Office ↔ PDF workflows. */
+export const OFFICE_MIME = {
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+} as const;
+
+/**
+ * Map a ToolDef's `accept` field (comma-separated MIME types) into the
+ * react-dropzone `Accept` object used by the uploader.
+ */
+export function acceptForTool(tool: Pick<ToolDef, 'accept'>): Record<string, string[]> {
+  const entries: Record<string, string[]> = {};
+  for (const mime of (tool.accept || '').split(',').map((m) => m.trim()).filter(Boolean)) {
+    entries[mime] = [];
+  }
+  return entries;
+}
 
 const IMAGE_SETTINGS: SettingField[] = [
   {
@@ -324,12 +343,12 @@ export const TOOLS: ToolDef[] = [
   },
   { id: 'pdf-to-png', category: 'convert', name: 'PDF to PNG', tagline: 'High-quality PNG renders of every PDF page.', description: 'Render every page of your PDF as a sharp PNG image with crisp text and graphics. Multi-page files are delivered as a tidy ZIP.', icon: FileType2, kind: 'pdf-to-image', accept: 'application/pdf', acceptHint: 'PDF', minFiles: 1, maxFiles: 1, settings: PDF_TO_IMAGE_SETTINGS, related: ['pdf-to-jpg'], accent: ['#34d399', '#065f46'] as const },
   { id: 'pdf-to-webp', category: 'convert', name: 'PDF to WEBP', tagline: 'Compact, web-friendly WEBP images from PDF pages.', description: 'Render PDF pages into efficient WEBP images that load fast on the web. Multi-page files are delivered as a ZIP.', icon: FileImage, kind: 'pdf-to-image', accept: 'application/pdf', acceptHint: 'PDF', minFiles: 1, maxFiles: 1, settings: PDF_TO_IMAGE_SETTINGS, related: ['pdf-to-jpg'], accent: ['#2dd4bf', '#0f766e'] as const },
-  { id: 'word-to-pdf', category: 'convert', name: 'Word to PDF', tagline: 'Convert DOCX documents into faithful PDFs.', description: 'Turn Word documents into PDFs.', icon: FileType2, kind: 'soon', accept: '', acceptHint: '', minFiles: 1, maxFiles: 1, related: ['pdf-to-word'], accent: ['#60a5fa', '#1d4ed8'] as const, soon: true },
-  { id: 'excel-to-pdf', category: 'convert', name: 'Excel to PDF', tagline: 'Spreadsheets into shareable PDFs.', description: 'Turn Excel workbooks into PDFs.', icon: FileSpreadsheet, kind: 'soon', accept: '', acceptHint: '', minFiles: 1, maxFiles: 1, related: ['pdf-to-excel'], accent: ['#4ade80', '#15803d'] as const, soon: true },
-  { id: 'ppt-to-pdf', category: 'convert', name: 'PowerPoint to PDF', tagline: 'Slide decks into clean PDF pages.', description: 'Turn PowerPoint files into PDFs.', icon: Presentation, kind: 'soon', accept: '', acceptHint: '', minFiles: 1, maxFiles: 1, related: ['pdf-to-ppt'], accent: ['#fb7185', '#be123c'] as const, soon: true },
-  { id: 'pdf-to-word', category: 'convert', name: 'PDF to Word', tagline: 'Editable DOCX from your PDF.', description: 'Convert PDF to editable Word.', icon: FileType2, kind: 'soon', accept: '', acceptHint: '', minFiles: 1, maxFiles: 1, related: ['word-to-pdf'], accent: ['#60a5fa', '#1e40af'] as const, soon: true },
-  { id: 'pdf-to-excel', category: 'convert', name: 'PDF to Excel', tagline: 'Extract tables from PDFs into XLSX.', description: 'Convert PDF to spreadsheet.', icon: FileJson, kind: 'soon', accept: '', acceptHint: '', minFiles: 1, maxFiles: 1, related: ['excel-to-pdf'], accent: ['#4ade80', '#166534'] as const, soon: true },
-  { id: 'pdf-to-ppt', category: 'convert', name: 'PDF to PowerPoint', tagline: 'Turn PDF pages into an editable deck.', description: 'Convert PDF to PowerPoint.', icon: FileDown, kind: 'soon', accept: '', acceptHint: '', minFiles: 1, maxFiles: 1, related: ['ppt-to-pdf'], accent: ['#fb7185', '#9f1239'] as const, soon: true },
+  { id: 'word-to-pdf', category: 'convert', name: 'Word to PDF', tagline: 'Convert DOCX documents into faithful PDFs.', description: 'Turn Word documents into pixel-perfect PDFs with real WYSIWYG layout — fonts, margins and tables preserved exactly as in Word.', icon: FileType2, kind: 'office', accept: OFFICE_MIME.docx, acceptHint: 'DOCX', minFiles: 1, maxFiles: 1, related: ['pdf-to-word'], accent: ['#60a5fa', '#1d4ed8'] as const },
+  { id: 'excel-to-pdf', category: 'convert', name: 'Excel to PDF', tagline: 'Spreadsheets into shareable PDFs.', description: 'Turn Excel workbooks into clean PDFs with all rows, columns and formatting intact — ready to share or print.', icon: FileSpreadsheet, kind: 'office', accept: OFFICE_MIME.xlsx, acceptHint: 'XLSX', minFiles: 1, maxFiles: 1, related: ['pdf-to-excel'], accent: ['#4ade80', '#15803d'] as const },
+  { id: 'ppt-to-pdf', category: 'convert', name: 'PowerPoint to PDF', tagline: 'Slide decks into clean PDF pages.', description: 'Turn PowerPoint decks into polished PDF slides — each slide becomes its own crisp page.', icon: Presentation, kind: 'office', accept: OFFICE_MIME.pptx, acceptHint: 'PPTX', minFiles: 1, maxFiles: 1, related: ['pdf-to-ppt'], accent: ['#fb7185', '#be123c'] as const },
+  { id: 'pdf-to-word', category: 'convert', name: 'PDF to Word', tagline: 'Editable DOCX from your PDF.', description: 'Convert a PDF into an editable Word document using LibreOffice. Text-only PDFs are reconstructed cleanly in DOCX.', icon: FileType2, kind: 'office', accept: 'application/pdf', acceptHint: 'PDF', minFiles: 1, maxFiles: 1, related: ['word-to-pdf'], accent: ['#60a5fa', '#1e40af'] as const },
+  { id: 'pdf-to-excel', category: 'convert', name: 'PDF to Excel', tagline: 'Extract tables from PDFs into XLSX.', description: 'Pull the content of your PDF into an editable spreadsheet — every paragraph and table becomes a row you can work with.', icon: FileJson, kind: 'office', accept: 'application/pdf', acceptHint: 'PDF', minFiles: 1, maxFiles: 1, related: ['excel-to-pdf'], accent: ['#4ade80', '#166534'] as const },
+  { id: 'pdf-to-ppt', category: 'convert', name: 'PDF to PowerPoint', tagline: 'Turn PDF pages into an editable deck.', description: 'Convert a PDF into an editable PowerPoint presentation — each page lands on its own slide.', icon: FileDown, kind: 'office', accept: 'application/pdf', acceptHint: 'PDF', minFiles: 1, maxFiles: 1, related: ['ppt-to-pdf'], accent: ['#fb7185', '#9f1239'] as const },
 
   // ── Organize ────────────────────────────────────────────
   {
@@ -368,19 +387,19 @@ export const TOOLS: ToolDef[] = [
   { id: 'crop-pdf', category: 'edit', name: 'Crop PDF', tagline: 'Trim pages to focus on the content.', description: 'Crop a PDF page.', icon: Crop, kind: 'soon', accept: '', acceptHint: '', minFiles: 1, maxFiles: 1, related: ['edit-pdf'], accent: ['#f87171', '#b91c1c'] as const, soon: true },
 
   // ── Security ────────────────────────────────────────────
-  { id: 'protect-pdf', category: 'security', name: 'Protect PDF', tagline: 'Lock your document with a strong password.', description: 'Set a password on a PDF.', icon: LockKeyhole, kind: 'soon', accept: '', acceptHint: '', minFiles: 1, maxFiles: 1, related: ['unlock-pdf', 'watermark'], accent: ['#f59e0b', '#92400e'] as const, soon: true },
-  { id: 'unlock-pdf', category: 'security', name: 'Unlock PDF', tagline: 'Remove a password you know.', description: 'Unlock a password-protected PDF.', icon: Unlock, kind: 'soon', accept: '', acceptHint: '', minFiles: 1, maxFiles: 1, related: ['protect-pdf'], accent: ['#34d399', '#047857'] as const, soon: true },
+  { id: 'protect-pdf', category: 'security', name: 'Protect PDF', tagline: 'Lock your document with a strong password.', description: 'Encrypt your PDF with a strong password so only people you trust can open it. Runs locally through LibreOffice with AES encryption.', icon: LockKeyhole, kind: 'securityPdf', accept: 'application/pdf', acceptHint: 'PDF', minFiles: 1, maxFiles: 1, settings: [{ key: 'password', label: 'Password', type: 'password', default: '', help: 'At least 4 characters. The file can only be opened with it.' }], related: ['unlock-pdf', 'watermark'], accent: ['#f59e0b', '#92400e'] as const },
+  { id: 'unlock-pdf', category: 'security', name: 'Unlock PDF', tagline: 'Remove a password you know.', description: 'Strip protection from a PDF you have the password for. Output is rebuilt page-by-page, so it opens freely without a password.', icon: Unlock, kind: 'securityPdf', accept: 'application/pdf', acceptHint: 'PDF', minFiles: 1, maxFiles: 1, settings: [{ key: 'password', label: 'Current password', type: 'password', default: '', help: 'Only needed if the PDF is password-protected.' }], related: ['protect-pdf'], accent: ['#34d399', '#047857'] as const },
   { id: 'watermark', category: 'security', name: 'Watermark PDF', tagline: 'Stamp a text watermark across every page.', description: 'Repeat a semi-transparent word or phrase across each page of your PDF to protect drafts and mark ownership.', icon: Droplets, kind: 'pdfOp', accept: 'application/pdf', acceptHint: 'PDF', minFiles: 1, maxFiles: 1, settings: [{ key: 'text', label: 'Watermark text', type: 'text', default: '', help: 'Repeated diagonally across each page.' }, { key: 'opacity', label: 'Opacity', type: 'slider', default: 0.25, min: 0.05, max: 0.9, step: 0.05 }], related: ['protect-pdf', 'sign-pdf'], accent: ['#38bdf8', '#0369a1'] as const },
-  { id: 'redact-pdf', category: 'security', name: 'Redact PDF', tagline: 'Permanently black out sensitive content.', description: 'Redact a PDF.', icon: EyeOff, kind: 'soon', accept: '', acceptHint: '', minFiles: 1, maxFiles: 1, related: ['protect-pdf'], accent: ['#f87171', '#991b1b'] as const, soon: true },
+  { id: 'redact-pdf', category: 'security', name: 'Redact PDF', tagline: 'Permanently black out sensitive content.', description: 'Black out every mention of the terms you choose across your whole PDF — permanently. The removed text is gone for good.', icon: EyeOff, kind: 'securityPdf', accept: 'application/pdf', acceptHint: 'PDF', minFiles: 1, maxFiles: 1, settings: [{ key: 'terms', label: 'Terms to redact', type: 'text', default: '', help: 'Comma separated, e.g. "John Doe, 123-45-6789". Matching text is blacked out.' }], related: ['protect-pdf'], accent: ['#f87171', '#991b1b'] as const },
 
   // ── Sign ────────────────────────────────────────────────
   { id: 'sign-pdf', category: 'sign', name: 'Sign PDF', tagline: 'Type a signature onto your document.', description: 'Place a clean typed signature near the bottom of the last page of your PDF, ready to send back instantly.', icon: PenLine, kind: 'pdfOp', accept: 'application/pdf', acceptHint: 'PDF', minFiles: 1, maxFiles: 1, settings: [{ key: 'text', label: 'Your signature', type: 'text', default: '', help: 'Placed near the bottom of the last page.' }], related: ['watermark', 'compress-pdf'], accent: ['#34d399', '#065f46'] as const },
-  { id: 'request-signature', category: 'sign', name: 'Request Signature', tagline: 'Ask others to sign securely.', description: 'Request signatures from others.', icon: FileSignature, kind: 'soon', accept: '', acceptHint: '', minFiles: 1, maxFiles: 1, related: ['sign-pdf'], accent: ['#c084fc', '#6d28d9'] as const, soon: true },
+  { id: 'request-signature', category: 'sign', name: 'Request Signature', tagline: 'Ask others to sign securely.', description: 'Upload a PDF and instantly create a private signing link. Share it with whoever needs to sign — they open the link, type their name, and get the signed document back. No accounts, no app install.', icon: FileSignature, kind: 'signatureRequest', accept: 'application/pdf', acceptHint: 'PDF', minFiles: 1, maxFiles: 1, settings: [{ key: 'signerName', label: 'Who should sign', type: 'text', default: '', help: 'The recipient\u2019s name, so they know the request is for them.' }, { key: 'signerEmail', label: 'Recipient email (optional)', type: 'text', default: '', help: 'For reference only — nothing is emailed; you share the link yourself.' }], related: ['sign-pdf'], accent: ['#c084fc', '#6d28d9'] as const },
 
   // ── AI ──────────────────────────────────────────────────
-  { id: 'ai-summary', category: 'ai', name: 'AI PDF Summary', tagline: 'Instant summary of any document.', description: 'Summarise a document with AI.', icon: Sparkles, kind: 'soon', accept: '', acceptHint: '', minFiles: 1, maxFiles: 1, related: ['ask-pdf'], accent: ['#a78bfa', '#7c3aed'] as const, soon: true },
-  { id: 'ask-pdf', category: 'ai', name: 'Ask PDF', tagline: 'Chat with your document.', description: 'Ask questions about a PDF.', icon: MessageSquareText, kind: 'soon', accept: '', acceptHint: '', minFiles: 1, maxFiles: 1, related: ['ai-summary'], accent: ['#818cf8', '#4f46e5'] as const, soon: true },
-  { id: 'pdf-to-markdown', category: 'ai', name: 'PDF to Markdown', tagline: 'Clean Markdown from any PDF.', description: 'Convert PDF to Markdown.', icon: FileJson, kind: 'soon', accept: '', acceptHint: '', minFiles: 1, maxFiles: 1, related: ['ask-pdf'], accent: ['#f472b6', '#be185d'] as const, soon: true },
+  { id: 'ai-summary', category: 'ai', name: 'AI PDF Summary', tagline: 'Instant summary of any document.', description: 'Extract pages into text and have AI condense the whole document into a tight, readable summary you can copy or download as Markdown.', icon: Sparkles, kind: 'aiDoc', accept: 'application/pdf', acceptHint: 'PDF', minFiles: 1, maxFiles: 1, related: ['ask-pdf'], accent: ['#a78bfa', '#7c3aed'] as const },
+  { id: 'ask-pdf', category: 'ai', name: 'Ask PDF', tagline: 'Chat with your document.', description: 'Ask questions about your PDF and get grounded answers drawn from the document text itself, with the source pages cited.', icon: MessageSquareText, kind: 'aiDoc', accept: 'application/pdf', acceptHint: 'PDF', minFiles: 1, maxFiles: 1, settings: [{ key: 'question', label: 'Your question', type: 'text', default: '', help: 'What do you want to know about this document?' }], related: ['ai-summary'], accent: ['#818cf8', '#4f46e5'] as const },
+  { id: 'pdf-to-markdown', category: 'ai', name: 'PDF to Markdown', tagline: 'Clean Markdown from any PDF.', description: 'Extract your PDF into clean, well-structured Markdown — headings, paragraphs and page markers preserved for notes, docs and publishing.', icon: FileJson, kind: 'aiDoc', accept: 'application/pdf', acceptHint: 'PDF', minFiles: 1, maxFiles: 1, related: ['ask-pdf'], accent: ['#f472b6', '#be185d'] as const },
 ];
 
 const byId = new Map<string, ToolDef>(TOOLS.map((t) => [t.id, t]));
